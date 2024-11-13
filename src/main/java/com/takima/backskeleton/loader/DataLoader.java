@@ -58,9 +58,9 @@ public class DataLoader implements CommandLineRunner {
 
     private void loadRooms() {
         roomRepository.saveAll(Arrays.asList(
-                new Room("General Quiz Room", 15),
-                new Room("Science Room", 10),
-                new Room("History Room", 20)
+                new Room("General Quiz Room"),
+                new Room("Science Room"),
+                new Room("History Room")
         ));
     }
 

@@ -68,15 +68,14 @@ public class QuizCLI implements CommandLineRunner {
 
     private void createRoom() {
         System.out.print("Entrez le nom de la room : ");
-        String name = scanner.nextLine();
-        System.out.print("Entrez le nombre de questions dans cette room : ");
-        int capacity = getIntInput(1, Integer.MAX_VALUE); // Ensure capacity is a positive number
+        String name = scanner.nextLine().trim();
+        if (name.isEmpty()) {
+            System.out.println("Le nom de la room ne peut pas être vide.");
+            return;
+        }
 
-        // Création de la room en base de données
-        Room room = new Room(name, capacity);
-        room = roomRepository.save(room);
-
-        System.out.println("Room créée et sauvegardée en base : " + room);
+        System.out.print("Entrez le nombre de questions souhaitées : ");
+        int numberOfQuestions = getIntInput(1, Integer.MAX_VALUE);
 
         // Sélection du thème pour la room
         String[] themes = {"Mathématiques", "Histoire", "Science", "Géographie", "Informatique", "Littérature", "Autre"};
@@ -91,8 +90,20 @@ public class QuizCLI implements CommandLineRunner {
         // Récupérer toutes les questions qui correspondent au thème sélectionné
         List<Question> allQuestions = questionRepository.findByTheme(selectedTheme);
 
+        // Vérifier s'il y a assez de questions sur le thème souhaité
+        if (allQuestions.size() < numberOfQuestions) {
+            System.out.println("Il n'y a pas assez de questions sur le thème souhaité pour créer une room.");
+            return;
+        }
+
+        // Création de la room en base de données
+        Room room = new Room(name);
+        room = roomRepository.save(room);
+
+        System.out.println("Room créée et sauvegardée en base : " + room);
+
         // Sélectionner des questions aléatoires
-        List<Question> selectedQuestions = getRandomQuestions(allQuestions, capacity);
+        List<Question> selectedQuestions = getRandomQuestions(allQuestions, numberOfQuestions);
 
         // Associer les questions à la room
         for (Question question : selectedQuestions) {
@@ -103,6 +114,7 @@ public class QuizCLI implements CommandLineRunner {
         roomRepository.save(room);
         System.out.println("Les questions ont été associées à la room.");
     }
+
 
     private List<Question> getRandomQuestions(List<Question> allQuestions, int numberOfQuestions) {
         List<Question> randomQuestions = new ArrayList<>(allQuestions);
@@ -115,11 +127,16 @@ public class QuizCLI implements CommandLineRunner {
 
         while (true) {
             System.out.print("Entrez le corps de la question (ou 'stop' pour arrêter) : ");
-            String body = scanner.nextLine();
+            String body = scanner.nextLine().trim();
 
             if (body.equalsIgnoreCase("stop")) {
                 System.out.println("Arrêt de la saisie des questions.");
                 break;
+            }
+
+            if (body.isEmpty()) {
+                System.out.println("Le corps de la question ne peut pas être vide.");
+                continue;
             }
 
             // Sélection du thème et du type de question
@@ -134,6 +151,11 @@ public class QuizCLI implements CommandLineRunner {
             System.out.print("Entrez le type de question (qcm ou vrai/faux) : ");
             String typeChoice = scanner.nextLine().trim().toLowerCase();
 
+            if (!typeChoice.equals("qcm") && !typeChoice.equals("vrai/faux")) {
+                System.out.println("Type de question invalide. Veuillez entrer 'qcm' ou 'vrai/faux'.");
+                continue;
+            }
+
             QuestionType selectedType = new QuestionType(typeChoice);
 
             // Gestion des réponses
@@ -145,10 +167,16 @@ public class QuizCLI implements CommandLineRunner {
 
                 for (int i = 0; i < nbReponses; i++) {
                     System.out.print("Entrez la réponse " + (i + 1) + " : ");
-                    String answerText = scanner.nextLine();
+                    String answerText = scanner.nextLine().trim();
+
+                    if (answerText.isEmpty()) {
+                        System.out.println("Le texte de la réponse ne peut pas être vide.");
+                        i--; // Décrémente i pour réessayer cette itération
+                        continue;
+                    }
 
                     System.out.print("Cette réponse est-elle correcte ? (true/false) : ");
-                    boolean isCorrect = Boolean.parseBoolean(scanner.nextLine().trim());
+                    boolean isCorrect = getBooleanInput();
 
                     // Créer une nouvelle réponse et l'ajouter à la liste des réponses
                     Answer answer = new Answer(null, isCorrect, answerText);
@@ -165,7 +193,7 @@ public class QuizCLI implements CommandLineRunner {
                 System.out.println("Réponses créées : " + answers);
 
                 System.out.print("La réponse attendue est-elle true ou false ? : ");
-                boolean isCorrect = Boolean.parseBoolean(scanner.nextLine().trim());
+                boolean isCorrect = getBooleanInput();
             }
 
             // Créer la question
@@ -187,6 +215,7 @@ public class QuizCLI implements CommandLineRunner {
             System.out.println("Question et réponses ajoutées et sauvegardées en base : " + question);
         }
     }
+
     private void startQuiz() {
         List<Room> rooms = roomRepository.findAll();
         if (rooms.isEmpty()) {
@@ -207,17 +236,23 @@ public class QuizCLI implements CommandLineRunner {
         List<String> players = new ArrayList<>();
         for (int i = 0; i < playerCount; i++) {
             System.out.print("Entrez le nom du joueur " + (i + 1) + " : ");
-            players.add(scanner.nextLine());
+            String playerName = scanner.nextLine().trim();
+            if (playerName.isEmpty()) {
+                System.out.println("Le nom du joueur ne peut pas être vide.");
+                i--; // Décrémente i pour réessayer cette itération
+                continue;
+            }
+            players.add(playerName);
         }
 
         List<Integer> scores = new ArrayList<>(playerCount);
         for (int i = 0; i < playerCount; i++) scores.add(0);
 
         for (int qIndex = 0; qIndex < room.getQuestions().size(); qIndex++) {
-            Question question = (Question) room.getQuestions().get(qIndex);
+            Question question = room.getQuestions().get(qIndex);
             System.out.println("Question " + (qIndex + 1) + ": " + question.getBody());
             System.out.println("Thème: " + question.getTheme().getName() + " | Type: " + question.getQuestionType().getType());
-            //System.out.println("reponse" + question.getAnswers());
+
             // Afficher les réponses
             if ("qcm".equals(question.getQuestionType().getType())) {
                 System.out.println("Choix possibles :");
@@ -228,8 +263,36 @@ public class QuizCLI implements CommandLineRunner {
             }
 
             for (int pIndex = 0; pIndex < playerCount; pIndex++) {
-                System.out.print("Réponse du joueur " + players.get(pIndex) + " : ");
-                String answer = scanner.nextLine();
+                String answer = "";
+                if ("qcm".equals(question.getQuestionType().getType())) {
+                    while (true) {
+                        System.out.print("Réponse du joueur " + players.get(pIndex) + " : ");
+                        answer = scanner.nextLine().trim();
+                        boolean validAnswer = false;
+                        for (Answer a : question.getAnswers()) {
+                            if (a.getBody().equalsIgnoreCase(answer)) {
+                                validAnswer = true;
+                                break;
+                            }
+                        }
+                        if (validAnswer) {
+                            break;
+                        } else {
+                            System.out.println("Réponse invalide. Veuillez entrer une des réponses proposées.");
+                        }
+                    }
+                } else if ("vrai/faux".equals(question.getQuestionType().getType())) {
+                    while (true) {
+                        System.out.print("Réponse du joueur " + players.get(pIndex) + " : ");
+                        answer = scanner.nextLine().trim().toLowerCase();
+                        if (answer.equals("vrai") || answer.equals("faux")) {
+                            break;
+                        } else {
+                            System.out.println("Réponse invalide. Veuillez entrer 'vrai' ou 'faux'.");
+                        }
+                    }
+                }
+
                 if (question.isCorrect(answer)) {
                     scores.set(pIndex, scores.get(pIndex) + 1);
                     System.out.println("Bonne réponse !");
@@ -245,12 +308,13 @@ public class QuizCLI implements CommandLineRunner {
         }
     }
 
+
     // Helper method to safely get a valid integer input within a specified range
     private int getIntInput(int min, int max) {
         int choice = -1;
         while (choice < min || choice > max) {
             try {
-                choice = Integer.parseInt(scanner.nextLine());
+                choice = Integer.parseInt(scanner.nextLine().trim());
                 if (choice < min || choice > max) {
                     System.out.println("Veuillez entrer un nombre entre " + min + " et " + max);
                 }
@@ -259,5 +323,17 @@ public class QuizCLI implements CommandLineRunner {
             }
         }
         return choice;
+    }
+
+    // Helper method to safely get a valid boolean input
+    private boolean getBooleanInput() {
+        while (true) {
+            String input = scanner.nextLine().trim().toLowerCase();
+            if (input.equals("true") || input.equals("false")) {
+                return Boolean.parseBoolean(input);
+            } else {
+                System.out.println("Entrée invalide. Veuillez entrer 'true' ou 'false'.");
+            }
+        }
     }
 }

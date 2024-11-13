@@ -36,7 +36,6 @@ public class RoomService {
 
         // Mettre à jour les propriétés de l'existant
         existingRoom.setName(room.getName());
-        existingRoom.setCapacity(room.getCapacity());
 
         // Sauvegarder la salle mise à jour
         roomDao.save(existingRoom);

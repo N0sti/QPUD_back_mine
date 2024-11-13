@@ -4,16 +4,14 @@ public class RoomDto {
 
     private Long id;
     private String name;
-    private int capacity;
 
     // Constructeurs
     public RoomDto() {
     }
 
-    public RoomDto(Long id, String name, int capacity) {
+    public RoomDto(Long id, String name) {
         this.id = id;
         this.name = name;
-        this.capacity = capacity;
     }
 
     // Getters et Setters
@@ -31,13 +29,5 @@ public class RoomDto {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
     }
 }

@@ -1,8 +1,22 @@
+-- Supprimer les tables existantes si elles existent
+DROP TABLE IF EXISTS room_settings_types;
+DROP TABLE IF EXISTS room_settings_themes;
+DROP TABLE IF EXISTS user_responses;
+DROP TABLE IF EXISTS room_questions;
+DROP TABLE IF EXISTS room_settings;
+DROP TABLE IF EXISTS user_in_room;
+DROP TABLE IF EXISTS answers;
+DROP TABLE IF EXISTS questions;
+DROP TABLE IF EXISTS question_type;
+DROP TABLE IF EXISTS theme;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS room;
+
+-- Créer les tables
 CREATE TABLE room
 (
     id SERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR NOT NULL,
-    capacity INT NOT NULL
+    name VARCHAR NOT NULL
 );
 
 CREATE TABLE users
