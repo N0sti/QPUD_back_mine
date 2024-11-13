@@ -19,7 +19,7 @@ public class Room {
     private int capacity;
 
     // Relation OneToMany avec la classe Question
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Question> questions = new ArrayList<>();
 
     // Constructeurs
@@ -74,5 +74,15 @@ public class Room {
     public void removeQuestion(Question question) {
         questions.remove(question);
         question.setRoom(null); // Dissocier la question de la salle
+    }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", capacity=" + capacity +
+                ", questions=" + questions +
+                '}';
     }
 }

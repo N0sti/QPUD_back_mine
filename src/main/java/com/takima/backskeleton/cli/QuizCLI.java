@@ -216,7 +216,16 @@ public class QuizCLI implements CommandLineRunner {
         for (int qIndex = 0; qIndex < room.getQuestions().size(); qIndex++) {
             Question question = (Question) room.getQuestions().get(qIndex);
             System.out.println("Question " + (qIndex + 1) + ": " + question.getBody());
-            System.out.println("Thème: " + question.getTheme() + " | Type: " + question.getType());
+            System.out.println("Thème: " + question.getTheme().getName() + " | Type: " + question.getQuestionType().getType());
+            //System.out.println("reponse" + question.getAnswers());
+            // Afficher les réponses
+            if ("qcm".equals(question.getQuestionType().getType())) {
+                System.out.println("Choix possibles :");
+                List<Answer> answers = question.getAnswers();
+                for (int i = 0; i < answers.size(); i++) {
+                    System.out.println((i + 1) + ". " + answers.get(i).getBody());
+                }
+            }
 
             for (int pIndex = 0; pIndex < playerCount; pIndex++) {
                 System.out.print("Réponse du joueur " + players.get(pIndex) + " : ");

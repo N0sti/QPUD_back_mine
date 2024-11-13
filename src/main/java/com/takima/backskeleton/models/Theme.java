@@ -32,6 +32,9 @@ public class Theme {
     public Theme(String themeName) {
         this.name = themeName;
     }
+    public String getName() {
+        return name;
+    }
 
     // Case-insensitive comparison of theme names
     public boolean hasNameIgnoreCase(String otherName) {
