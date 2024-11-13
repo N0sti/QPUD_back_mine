@@ -50,6 +50,7 @@ public class Answer {
     public void setCorrect(boolean correct) {
         this.isCorrect = correct;
     }
+
     // Méthode toString pour afficher les détails de l'objet Answer
     @Override
     public String toString() {

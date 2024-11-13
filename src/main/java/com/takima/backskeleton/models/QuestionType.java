@@ -29,6 +29,18 @@ public class QuestionType {
     public QuestionType(String type) {
         this.type = type;
     }
+    // Explicit getter method for type
+    public String getType() {
+        return type;
+    }
+    
+    @Override
+    public String toString() {
+        return "QuestionType{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                '}';
+    }
 
     public static class Builder {
         private Long id;
