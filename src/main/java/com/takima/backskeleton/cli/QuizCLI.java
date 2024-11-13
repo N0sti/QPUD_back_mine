@@ -256,8 +256,36 @@ public class QuizCLI implements CommandLineRunner {
             }
 
             for (int pIndex = 0; pIndex < playerCount; pIndex++) {
-                System.out.print("Réponse du joueur " + players.get(pIndex) + " : ");
-                String answer = scanner.nextLine().trim();
+                String answer = "";
+                if ("qcm".equals(question.getQuestionType().getType())) {
+                    while (true) {
+                        System.out.print("Réponse du joueur " + players.get(pIndex) + " : ");
+                        answer = scanner.nextLine().trim();
+                        boolean validAnswer = false;
+                        for (Answer a : question.getAnswers()) {
+                            if (a.getBody().equalsIgnoreCase(answer)) {
+                                validAnswer = true;
+                                break;
+                            }
+                        }
+                        if (validAnswer) {
+                            break;
+                        } else {
+                            System.out.println("Réponse invalide. Veuillez entrer une des réponses proposées.");
+                        }
+                    }
+                } else if ("vrai/faux".equals(question.getQuestionType().getType())) {
+                    while (true) {
+                        System.out.print("Réponse du joueur " + players.get(pIndex) + " : ");
+                        answer = scanner.nextLine().trim().toLowerCase();
+                        if (answer.equals("true") || answer.equals("false")) {
+                            break;
+                        } else {
+                            System.out.println("Réponse invalide. Veuillez entrer 'true' ou 'false'.");
+                        }
+                    }
+                }
+
                 if (question.isCorrect(answer)) {
                     scores.set(pIndex, scores.get(pIndex) + 1);
                     System.out.println("Bonne réponse !");
