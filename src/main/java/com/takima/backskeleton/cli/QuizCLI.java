@@ -74,14 +74,8 @@ public class QuizCLI implements CommandLineRunner {
             return;
         }
 
-        System.out.print("Entrez le nombre de questions dans cette room : ");
-        int capacity = getIntInput(1, Integer.MAX_VALUE); // Ensure capacity is a positive number
-
-        // Création de la room en base de données
-        Room room = new Room(name, capacity);
-        room = roomRepository.save(room);
-
-        System.out.println("Room créée et sauvegardée en base : " + room);
+        System.out.print("Entrez le nombre de questions souhaitées : ");
+        int numberOfQuestions = getIntInput(1, Integer.MAX_VALUE);
 
         // Sélection du thème pour la room
         String[] themes = {"Mathématiques", "Histoire", "Science", "Géographie", "Informatique", "Littérature", "Autre"};
@@ -96,8 +90,20 @@ public class QuizCLI implements CommandLineRunner {
         // Récupérer toutes les questions qui correspondent au thème sélectionné
         List<Question> allQuestions = questionRepository.findByTheme(selectedTheme);
 
+        // Vérifier s'il y a assez de questions sur le thème souhaité
+        if (allQuestions.size() < numberOfQuestions) {
+            System.out.println("Il n'y a pas assez de questions sur le thème souhaité pour créer une room.");
+            return;
+        }
+
+        // Création de la room en base de données
+        Room room = new Room(name);
+        room = roomRepository.save(room);
+
+        System.out.println("Room créée et sauvegardée en base : " + room);
+
         // Sélectionner des questions aléatoires
-        List<Question> selectedQuestions = getRandomQuestions(allQuestions, capacity);
+        List<Question> selectedQuestions = getRandomQuestions(allQuestions, numberOfQuestions);
 
         // Associer les questions à la room
         for (Question question : selectedQuestions) {
@@ -108,6 +114,7 @@ public class QuizCLI implements CommandLineRunner {
         roomRepository.save(room);
         System.out.println("Les questions ont été associées à la room.");
     }
+
 
     private List<Question> getRandomQuestions(List<Question> allQuestions, int numberOfQuestions) {
         List<Question> randomQuestions = new ArrayList<>(allQuestions);
@@ -278,10 +285,10 @@ public class QuizCLI implements CommandLineRunner {
                     while (true) {
                         System.out.print("Réponse du joueur " + players.get(pIndex) + " : ");
                         answer = scanner.nextLine().trim().toLowerCase();
-                        if (answer.equals("true") || answer.equals("false")) {
+                        if (answer.equals("vrai") || answer.equals("faux")) {
                             break;
                         } else {
-                            System.out.println("Réponse invalide. Veuillez entrer 'true' ou 'false'.");
+                            System.out.println("Réponse invalide. Veuillez entrer 'vrai' ou 'faux'.");
                         }
                     }
                 }
@@ -300,6 +307,7 @@ public class QuizCLI implements CommandLineRunner {
             System.out.println(players.get(i) + ": " + scores.get(i) + " points");
         }
     }
+
 
     // Helper method to safely get a valid integer input within a specified range
     private int getIntInput(int min, int max) {

@@ -15,9 +15,6 @@ public class Room {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private int capacity;
-
     // Relation OneToMany avec la classe Question
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Question> questions = new ArrayList<>();
@@ -26,9 +23,8 @@ public class Room {
     public Room() {
     }
 
-    public Room(String name, int capacity) {
+    public Room(String name) {
         this.name = name;
-        this.capacity = capacity;
     }
 
     // Getters et Setters
@@ -46,14 +42,6 @@ public class Room {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
     }
 
     public List<Question> getQuestions() {
@@ -81,7 +69,6 @@ public class Room {
         return "Room{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", capacity=" + capacity +
                 ", questions=" + questions +
                 '}';
     }

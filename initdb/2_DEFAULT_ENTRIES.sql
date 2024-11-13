@@ -1,7 +1,7 @@
 INSERT INTO room (name, capacity) VALUES
-                                      ('General Quiz Room', 15),
-                                      ('Science Room', 10),
-                                      ('History Room', 20);
+                                      ('General Quiz Room'),
+                                      ('Science Room'),
+                                      ('History Room');
 
 INSERT INTO users (username, is_admin) VALUES
                                            ('alice', false),
