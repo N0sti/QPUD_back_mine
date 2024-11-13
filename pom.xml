@@ -15,7 +15,7 @@
 	<description>Skeleton of an API project</description>
 	<properties>
 		<java.version>22</java.version>
-		<lombok.version>1.18.20</lombok.version>
+		<lombok.version>1.18.34</lombok.version>
 		<springdoc.version>2.2.0</springdoc.version>
 	</properties>
 	<dependencies>
@@ -48,6 +48,10 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 	</dependencies>
 
