@@ -68,7 +68,12 @@ public class QuizCLI implements CommandLineRunner {
 
     private void createRoom() {
         System.out.print("Entrez le nom de la room : ");
-        String name = scanner.nextLine();
+        String name = scanner.nextLine().trim();
+        if (name.isEmpty()) {
+            System.out.println("Le nom de la room ne peut pas être vide.");
+            return;
+        }
+
         System.out.print("Entrez le nombre de questions dans cette room : ");
         int capacity = getIntInput(1, Integer.MAX_VALUE); // Ensure capacity is a positive number
 
@@ -115,11 +120,16 @@ public class QuizCLI implements CommandLineRunner {
 
         while (true) {
             System.out.print("Entrez le corps de la question (ou 'stop' pour arrêter) : ");
-            String body = scanner.nextLine();
+            String body = scanner.nextLine().trim();
 
             if (body.equalsIgnoreCase("stop")) {
                 System.out.println("Arrêt de la saisie des questions.");
                 break;
+            }
+
+            if (body.isEmpty()) {
+                System.out.println("Le corps de la question ne peut pas être vide.");
+                continue;
             }
 
             // Sélection du thème et du type de question
@@ -134,6 +144,11 @@ public class QuizCLI implements CommandLineRunner {
             System.out.print("Entrez le type de question (qcm ou vrai/faux) : ");
             String typeChoice = scanner.nextLine().trim().toLowerCase();
 
+            if (!typeChoice.equals("qcm") && !typeChoice.equals("vrai/faux")) {
+                System.out.println("Type de question invalide. Veuillez entrer 'qcm' ou 'vrai/faux'.");
+                continue;
+            }
+
             QuestionType selectedType = new QuestionType(typeChoice);
 
             // Gestion des réponses
@@ -145,10 +160,16 @@ public class QuizCLI implements CommandLineRunner {
 
                 for (int i = 0; i < nbReponses; i++) {
                     System.out.print("Entrez la réponse " + (i + 1) + " : ");
-                    String answerText = scanner.nextLine();
+                    String answerText = scanner.nextLine().trim();
+
+                    if (answerText.isEmpty()) {
+                        System.out.println("Le texte de la réponse ne peut pas être vide.");
+                        i--; // Décrémente i pour réessayer cette itération
+                        continue;
+                    }
 
                     System.out.print("Cette réponse est-elle correcte ? (true/false) : ");
-                    boolean isCorrect = Boolean.parseBoolean(scanner.nextLine().trim());
+                    boolean isCorrect = getBooleanInput();
 
                     // Créer une nouvelle réponse et l'ajouter à la liste des réponses
                     Answer answer = new Answer(null, isCorrect, answerText);
@@ -165,7 +186,7 @@ public class QuizCLI implements CommandLineRunner {
                 System.out.println("Réponses créées : " + answers);
 
                 System.out.print("La réponse attendue est-elle true ou false ? : ");
-                boolean isCorrect = Boolean.parseBoolean(scanner.nextLine().trim());
+                boolean isCorrect = getBooleanInput();
             }
 
             // Créer la question
@@ -187,6 +208,7 @@ public class QuizCLI implements CommandLineRunner {
             System.out.println("Question et réponses ajoutées et sauvegardées en base : " + question);
         }
     }
+
     private void startQuiz() {
         List<Room> rooms = roomRepository.findAll();
         if (rooms.isEmpty()) {
@@ -207,17 +229,23 @@ public class QuizCLI implements CommandLineRunner {
         List<String> players = new ArrayList<>();
         for (int i = 0; i < playerCount; i++) {
             System.out.print("Entrez le nom du joueur " + (i + 1) + " : ");
-            players.add(scanner.nextLine());
+            String playerName = scanner.nextLine().trim();
+            if (playerName.isEmpty()) {
+                System.out.println("Le nom du joueur ne peut pas être vide.");
+                i--; // Décrémente i pour réessayer cette itération
+                continue;
+            }
+            players.add(playerName);
         }
 
         List<Integer> scores = new ArrayList<>(playerCount);
         for (int i = 0; i < playerCount; i++) scores.add(0);
 
         for (int qIndex = 0; qIndex < room.getQuestions().size(); qIndex++) {
-            Question question = (Question) room.getQuestions().get(qIndex);
+            Question question = room.getQuestions().get(qIndex);
             System.out.println("Question " + (qIndex + 1) + ": " + question.getBody());
             System.out.println("Thème: " + question.getTheme().getName() + " | Type: " + question.getQuestionType().getType());
-            //System.out.println("reponse" + question.getAnswers());
+
             // Afficher les réponses
             if ("qcm".equals(question.getQuestionType().getType())) {
                 System.out.println("Choix possibles :");
@@ -229,7 +257,7 @@ public class QuizCLI implements CommandLineRunner {
 
             for (int pIndex = 0; pIndex < playerCount; pIndex++) {
                 System.out.print("Réponse du joueur " + players.get(pIndex) + " : ");
-                String answer = scanner.nextLine();
+                String answer = scanner.nextLine().trim();
                 if (question.isCorrect(answer)) {
                     scores.set(pIndex, scores.get(pIndex) + 1);
                     System.out.println("Bonne réponse !");
@@ -250,7 +278,7 @@ public class QuizCLI implements CommandLineRunner {
         int choice = -1;
         while (choice < min || choice > max) {
             try {
-                choice = Integer.parseInt(scanner.nextLine());
+                choice = Integer.parseInt(scanner.nextLine().trim());
                 if (choice < min || choice > max) {
                     System.out.println("Veuillez entrer un nombre entre " + min + " et " + max);
                 }
@@ -259,5 +287,17 @@ public class QuizCLI implements CommandLineRunner {
             }
         }
         return choice;
+    }
+
+    // Helper method to safely get a valid boolean input
+    private boolean getBooleanInput() {
+        while (true) {
+            String input = scanner.nextLine().trim().toLowerCase();
+            if (input.equals("true") || input.equals("false")) {
+                return Boolean.parseBoolean(input);
+            } else {
+                System.out.println("Entrée invalide. Veuillez entrer 'true' ou 'false'.");
+            }
+        }
     }
 }
