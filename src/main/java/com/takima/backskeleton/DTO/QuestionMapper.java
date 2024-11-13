@@ -32,16 +32,10 @@ public class QuestionMapper {
         );
     }
 
-
     public static Question fromDto(QuestionDto questionDto, Theme theme, QuestionType questionType) {
         if (questionDto == null) {
             return null;
         }
-
-        // Convertir les réponses en objets Answer
-        List<Answer> answers = questionDto.getAnswers().stream()
-                .map(answerDto -> new Answer(answerDto.getText(), answerDto.isCorrect()))
-                .collect(Collectors.toList());
 
         // Créer un nouvel objet Question avec les informations du DTO et les objets Theme et QuestionType
         Question question = new Question();
@@ -49,6 +43,12 @@ public class QuestionMapper {
         question.setBody(questionDto.getBody());
         question.setTheme(theme);            // Assurez-vous d'utiliser l'objet Theme passé en paramètre
         question.setQuestionType(questionType);  // Assurez-vous d'utiliser l'objet QuestionType passé en paramètre
+
+        // Convertir les réponses en objets Answer
+        List<Answer> answers = questionDto.getAnswers().stream()
+                .map(answerDto -> new Answer(question.getId(), answerDto.isCorrect(), answerDto.getBody()))
+                .collect(Collectors.toList());
+
         question.setAnswers(answers);        // Assigner les réponses à la question
 
         return question;

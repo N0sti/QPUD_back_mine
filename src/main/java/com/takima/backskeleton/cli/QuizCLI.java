@@ -138,7 +138,6 @@ public class QuizCLI implements CommandLineRunner {
 
             // Gestion des réponses
             List<Answer> answers = new ArrayList<>();
-            String bonneReponse = "";
 
             if ("qcm".equals(typeChoice)) {
                 System.out.print("Entrez le nombre de réponses possibles : ");
@@ -152,39 +151,42 @@ public class QuizCLI implements CommandLineRunner {
                     boolean isCorrect = Boolean.parseBoolean(scanner.nextLine().trim());
 
                     // Créer une nouvelle réponse et l'ajouter à la liste des réponses
-                    Answer answer = new Answer(answerText, isCorrect);
+                    Answer answer = new Answer(null, isCorrect, answerText);
                     answers.add(answer);
+                    System.out.println("Réponse créée : " + answer);
                 }
 
-                System.out.print("Entrez la réponse correcte : ");
-                bonneReponse = scanner.nextLine();
             } else if ("vrai/faux".equals(typeChoice)) {
-                Answer trueAnswer = new Answer("Vrai", false); // Réponse "Vrai"
-                Answer falseAnswer = new Answer("Faux", false); // Réponse "Faux"
+                Answer trueAnswer = new Answer(null, true, "Vrai"); // Réponse "Vrai"
+                Answer falseAnswer = new Answer(null, false, "Faux"); // Réponse "Faux"
 
                 answers.add(trueAnswer);
                 answers.add(falseAnswer);
+                System.out.println("Réponses créées : " + answers);
 
-                System.out.print("La réponse attendue est-elle 'Vrai' ou 'Faux' ? : ");
-                bonneReponse = scanner.nextLine().trim();
+                System.out.print("La réponse attendue est-elle true ou false ? : ");
+                boolean isCorrect = Boolean.parseBoolean(scanner.nextLine().trim());
             }
 
             // Créer la question
-            Question question = new Question(body, selectedTheme, selectedType, answers, bonneReponse);
+            Question question = new Question(body, selectedTheme, selectedType, answers);
+            System.out.println("Question créée : " + question);
 
             // Sauvegarder la question
-            questionRepository.save(question);
+            question = questionRepository.save(question);
+            System.out.println("Réponses avant sauvegarde : " + answers);
 
             // Sauvegarder les réponses associées à la question
             for (Answer answer : answers) {
                 answer.setQuestion(question); // Associer chaque réponse à la question
+                System.out.println("Réponse avant sauvegarde : " + answer);
                 answerRepository.save(answer); // Sauvegarder la réponse
+                System.out.println("Réponse sauvegardée : " + answer);
             }
 
             System.out.println("Question et réponses ajoutées et sauvegardées en base : " + question);
         }
     }
-
     private void startQuiz() {
         List<Room> rooms = roomRepository.findAll();
         if (rooms.isEmpty()) {

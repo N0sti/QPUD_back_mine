@@ -5,9 +5,8 @@ import com.takima.backskeleton.models.Question;
 
 public class AnswerMapper {
 
-    public static Answer fromDto(AnswerDto answerDto, Question question) {
-        Answer answer = new Answer(answerDto.getBody(), answerDto.isCorrect());
-        answer.setQuestion(question);  // Associer la réponse à la question
+    public static Answer fromDto(AnswerDto answerDto, Long questionId) {
+        Answer answer = new Answer(questionId, answerDto.isCorrect(), answerDto.getBody());
         return answer;
     }
 

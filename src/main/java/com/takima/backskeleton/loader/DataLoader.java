@@ -90,24 +90,25 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadQuestionsAndAnswers() {
+        // Sauvegarder les questions
         Question q1 = questionRepository.save(new Question(1, 1, "What is the capital of France?", themeRepository, questionTypeRepository));
         Question q2 = questionRepository.save(new Question(2, 2, "Water boils at 100 degrees Celsius.", themeRepository, questionTypeRepository));
         Question q3 = questionRepository.save(new Question(3, 1, "Who was the first president of the United States?", themeRepository, questionTypeRepository));
 
+        // Sauvegarder les réponses associées aux questions
         answerRepository.saveAll(Arrays.asList(
-                new Answer(q1, true, "Paris"),
-                new Answer(q1, false, "London"),
-                new Answer(q1, false, "Berlin"),
-                new Answer(q1, false, "Madrid"),
-                new Answer(q2, true, "True"),
-                new Answer(q2, false, "False"),
-                new Answer(q3, true, "George Washington"),
-                new Answer(q3, false, "Abraham Lincoln"),
-                new Answer(q3, false, "Thomas Jefferson"),
-                new Answer(q3, false, "John Adams")
+                new Answer(q1.getId(), true, "Paris"),
+                new Answer(q1.getId(), false, "London"),
+                new Answer(q1.getId(), false, "Berlin"),
+                new Answer(q1.getId(), false, "Madrid"),
+                new Answer(q2.getId(), true, "True"),
+                new Answer(q2.getId(), false, "False"),
+                new Answer(q3.getId(), true, "George Washington"),
+                new Answer(q3.getId(), false, "Abraham Lincoln"),
+                new Answer(q3.getId(), false, "Thomas Jefferson"),
+                new Answer(q3.getId(), false, "John Adams")
         ));
     }
-
 
     private void loadRoomSettings() {
         Room room1 = roomRepository.findById(1).orElseThrow();  // Assurez-vous d'utiliser Long pour l'ID

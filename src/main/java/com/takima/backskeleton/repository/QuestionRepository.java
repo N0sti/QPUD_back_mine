@@ -14,4 +14,8 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query("SELECT q FROM Question q WHERE q.theme.name = :theme")
     List<Question> findByTheme(String theme);
 
+    // Utilisation de @Query pour obtenir l'ID maximal des questions
+    @Query("SELECT MAX(q.id) FROM Question q")
+    Integer findMaxId();
+
 }

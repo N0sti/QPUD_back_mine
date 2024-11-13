@@ -17,7 +17,6 @@ import com.takima.backskeleton.DAO.AnswerDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,8 +30,6 @@ public class QuestionService {
     private final QuestionTypeDao questionTypeDao;
     private final AnswerDao answerDao; // Ajout du DAO pour la gestion des réponses
     private static final Logger logger = LoggerFactory.getLogger(QuestionService.class);  // Déclaration du logger
-
-
 
     public List<QuestionDto> findAll() {
         return questionDao.findAll().stream()
@@ -52,6 +49,7 @@ public class QuestionService {
             throw new EntityNotFoundException("Question not found with id: " + id);
         }
     }
+
     public void addQuestion(QuestionDto questionDto, List<AnswerDto> answers) {
         // Vérifier si la question existe déjà avec le même corps et type
         Optional<Question> existingQuestion = questionDao.findByBodyAndType(questionDto.getBody(), findQuestionTypeById(questionDto.getTypeId()));
@@ -71,13 +69,12 @@ public class QuestionService {
                 .build();
 
         // Sauvegarder la question et l'associer aux entités Theme et QuestionType
-        questionDao.save(question);
+        question = questionDao.save(question);
 
         // Sauvegarder les réponses associées
         if (answers != null) {
             for (AnswerDto answerDto : answers) {
-                Answer answer = new Answer(answerDto.getBody(), answerDto.getIsCorrect());
-                answer.setQuestion(question); // Associer la réponse à la question
+                Answer answer = new Answer(question.getId(), answerDto.getIsCorrect(), answerDto.getBody());
                 answerDao.save(answer); // Sauvegarder la réponse
             }
         }
@@ -113,7 +110,7 @@ public class QuestionService {
         question.setType(type);
 
         // Sauvegarder la question mise à jour
-        questionDao.save(question);
+        question = questionDao.save(question);
 
         // Mettre à jour les réponses
         if (questionDto.getAnswers() != null) {
@@ -122,8 +119,7 @@ public class QuestionService {
 
             // Ajouter les nouvelles réponses
             for (AnswerDto answerDto : questionDto.getAnswers()) {
-                Answer answer = new Answer(answerDto.getBody(), answerDto.getIsCorrect());
-                answer.setQuestion(question);
+                Answer answer = new Answer(question.getId(), answerDto.getIsCorrect(), answerDto.getBody());
                 answerDao.save(answer); // Sauvegarder la nouvelle réponse
             }
         }

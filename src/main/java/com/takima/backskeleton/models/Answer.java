@@ -28,14 +28,12 @@ public class Answer {
     protected Answer() {
     }
 
-    // Constructeur pour initialiser Answer avec Question, body, et isCorrect
-    public Answer(Question question, Boolean isCorrect, String body) {
-        this.question = question;
+    // Constructeur pour initialiser Answer avec question_id, body, et isCorrect
+    public Answer(Long questionId, Boolean isCorrect, String body) {
+        this.question = new Question();
+        this.question.setId(questionId);
         this.body = body;
         this.isCorrect = isCorrect;
-    }
-
-    public Answer(String answerText, boolean b) {
     }
 
     // Méthode pour obtenir le texte de la réponse
@@ -52,5 +50,14 @@ public class Answer {
     public void setCorrect(boolean correct) {
         this.isCorrect = correct;
     }
-
+    // Méthode toString pour afficher les détails de l'objet Answer
+    @Override
+    public String toString() {
+        return "Answer{" +
+                "id=" + id +
+                ", questionId=" + (question != null ? question.getId() : "null") +
+                ", body='" + body + '\'' +
+                ", isCorrect=" + isCorrect +
+                '}';
+    }
 }

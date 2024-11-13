@@ -40,7 +40,6 @@ public class Question {
     private List<Answer> answers;
 
     // Associe une salle à la question
-    @Setter
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
@@ -54,30 +53,12 @@ public class Question {
         this.theme = theme;
         this.type = type;
         this.answers = answers;
+        for (Answer answer : answers) {
+            answer.setQuestion(this); // Associer chaque réponse à la question
+        }
     }
 
     // Constructeur avec paramètres pour initialiser une question avec des réponses en texte
-
-
-    // Constructeur qui prend une liste d'objets Answer et la bonne réponse
-    public Question(String body, Theme theme, QuestionType type, List<Answer> answers, String correctAnswer) {
-        this.body = body;
-        this.theme = theme;
-        this.type = type;
-        this.answers = answers;
-
-        // Vérification de nullité avant de faire la comparaison
-        this.answers.forEach(answer -> {
-            if (answer.getBody() != null) {
-                answer.setCorrect(answer.getBody().equalsIgnoreCase(correctAnswer));
-            } else {
-                // Gestion du cas où la réponse est nulle
-                answer.setCorrect(false);  // ou vous pouvez loguer une erreur ou autre action
-            }
-        });
-    }
-
-
     public Question(int themeId, int typeId, String body, ThemeRepository themeRepository, QuestionTypeRepository questionTypeRepository) {
         this.body = body;
         this.theme = themeRepository.findById(themeId)
@@ -128,7 +109,6 @@ public class Question {
 
     // Builder pattern pour créer un objet Question
     public static class Builder {
-        public Long id;
         private String body;
         private Theme theme;
         private QuestionType type;
