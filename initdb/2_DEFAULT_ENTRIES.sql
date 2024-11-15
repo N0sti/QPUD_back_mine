@@ -1,4 +1,4 @@
-INSERT INTO room (name, capacity) VALUES
+INSERT INTO room (name) VALUES
                                       ('General Quiz Room'),
                                       ('Science Room'),
                                       ('History Room');
